@@ -3,7 +3,7 @@ package works.weave.socks.cart.entities;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 @Document
 public class Item {
@@ -38,17 +38,9 @@ public class Item {
         this(item.id(), item.itemId, quantity, item.unitPrice);
     }
 
-    public String id() {
-        return id;
-    }
-
-    public String itemId() {
-        return itemId;
-    }
-
-    public int quantity() {
-        return quantity;
-    }
+    public String id() { return id; }
+    public String itemId() { return itemId; }
+    public int quantity() { return quantity; }
 
     @Override
     public String toString() {
@@ -64,43 +56,16 @@ public class Item {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         Item item = (Item) o;
-
         return itemId != null ? itemId.equals(item.itemId) : item.itemId == null;
     }
 
-    // ****** Crappy getter/setters for Jackson JSON invoking ********
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getItemId() {
-        return itemId;
-    }
-
-    public void setItemId(String itemId) {
-        this.itemId = itemId;
-    }
-
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
-
-    public float getUnitPrice() {
-        return unitPrice;
-    }
-
-    public void setUnitPrice(float unitPrice) {
-        this.unitPrice = unitPrice;
-    }
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
+    public String getItemId() { return itemId; }
+    public void setItemId(String itemId) { this.itemId = itemId; }
+    public int getQuantity() { return quantity; }
+    public void setQuantity(int quantity) { this.quantity = quantity; }
+    public float getUnitPrice() { return unitPrice; }
+    public void setUnitPrice(float unitPrice) { this.unitPrice = unitPrice; }
 }

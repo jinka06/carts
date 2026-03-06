@@ -4,14 +4,14 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
 @Document
 public class Cart {
     @NotNull
-    public String customerId; // Public instead of getters/setters.
+    public String customerId;
     @Id
     private String id;
     @DBRef
@@ -52,12 +52,9 @@ public class Cart {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         Cart cart = (Cart) o;
-
         if (customerId != null ? !customerId.equals(cart.customerId) : cart.customerId != null) return false;
         if (id != null ? !id.equals(cart.id) : cart.id != null) return false;
-
         return true;
     }
 
