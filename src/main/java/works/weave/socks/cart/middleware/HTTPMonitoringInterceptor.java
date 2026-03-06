@@ -1,6 +1,7 @@
 package works.weave.socks.cart.middleware;
 
-import io.prometheus.client.Histogram;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -17,15 +18,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 public class HTTPMonitoringInterceptor implements HandlerInterceptor {
-    static final Histogram requestLatency = Histogram.build()
-            .name("http_request_duration_seconds")
-            .help("Request duration in seconds.")
-            .labelNames("service", "method", "path", "status_code")
-            .register();
 
     private static final String startTimeKey = "startTime";
+
+    @Autowired
+    private MeterRegistry meterRegistry;
     @Autowired
     ResourceMappings mappings;
     @Autowired
@@ -36,8 +36,10 @@ public class HTTPMonitoringInterceptor implements HandlerInterceptor {
     ApplicationContext applicationContext;
     @Autowired
     RequestMappingHandlerMapping requestMappingHandlerMapping;
+
     private Set<PatternsRequestCondition> urlPatterns;
-    @Value("${spring.application.name:orders}")
+
+    @Value("${spring.application.name:carts}")
     private String serviceName;
 
     @Override
@@ -52,15 +54,16 @@ public class HTTPMonitoringInterceptor implements HandlerInterceptor {
             httpServletResponse, Object o, ModelAndView modelAndView) throws Exception {
         long start = (long) httpServletRequest.getAttribute(startTimeKey);
         long elapsed = System.nanoTime() - start;
-        double seconds = (double) elapsed / 1000000000.0;
         String matchedUrl = getMatchingURLPattern(httpServletRequest);
         if (!matchedUrl.equals("")) {
-            requestLatency.labels(
-                    serviceName,
-                    httpServletRequest.getMethod(),
-                    matchedUrl,
-                    Integer.toString(httpServletResponse.getStatus())
-            ).observe(seconds);
+            Timer.builder("http_request_duration_seconds")
+                    .description("Request duration in seconds")
+                    .tag("service", serviceName)
+                    .tag("method", httpServletRequest.getMethod())
+                    .tag("path", matchedUrl)
+                    .tag("status_code", Integer.toString(httpServletResponse.getStatus()))
+                    .register(meterRegistry)
+                    .record(elapsed, TimeUnit.NANOSECONDS);
         }
     }
 
